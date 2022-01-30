@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: feed-importer
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: feed-importer
+            image: registry.gitlab.com/guilherme.hub2b/commandf.feed.importer
+            resources:
+              requests:
+                memory: 200Mi
+                cpu: 80m
+              limits:
+                memory: 400Mi
+                cpu: 100m 
+            env:
+            - name: MongoDb.ConnectionString
+              value: mongodb://root:5oPHY9A79y@catoou-default-mongodb.databases:27017/?authSource=admin&readPreference=primary&appname=ConfigApi&ssl=false
+            - name: ConfigAPI.Host
+              value: "http://config-api:5000"
+          restartPolicy: Never
+          concurrencyPolicy: Replace
+          imagePullSecrets:
+          - name: gitlab
